@@ -1,0 +1,40 @@
+# CI for mini-os. Runs when this folder is pushed as its own repository.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nasm gcc-multilib qemu-system-x86
+
+      - name: Build bootable image
+        run: make all
+
+      - name: Verify boot sector is 512 bytes with the 0x55AA signature
+        run: |
+          python3 - <<'PY'
+          b = open("build/boot.bin", "rb").read()
+          assert len(b) == 512, f"boot sector is {len(b)} bytes, not 512"
+          assert b[510] == 0x55 and b[511] == 0xAA, "missing 0xAA55 boot signature"
+          print("boot sector OK")
+          PY
+
+      - name: Host unit tests
+        run: make test
+
+      - name: Head-less boot test (QEMU serial)
+        run: make test-boot
