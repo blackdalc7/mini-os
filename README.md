@@ -1,5 +1,7 @@
 # mini-os
 
+[![CI](https://github.com/blackdalc7/mini-os/actions/workflows/ci.yml/badge.svg)](https://github.com/blackdalc7/mini-os/actions/workflows/ci.yml)
+
 A tiny "hello world" operating system: a hand-written **x86 boot sector** that
 loads a small **C kernel**, switches the CPU into 32-bit protected mode, and
 prints to the screen. It boots in QEMU. The point of the project is to see the
